@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:github_repo_browser_flutter/core/di/app_module.dart';
+import 'package:github_repo_browser_flutter/presentation/di/presentation_module.dart';
 import 'package:github_repo_browser_flutter/presentation/search/widgets/repos_grid.dart';
 import 'package:github_repo_browser_flutter/presentation/search/widgets/search_bar.dart';
 import 'package:logger/logger.dart';
@@ -10,7 +10,7 @@ class SearchPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final reposState = ref.watch(reposControllerProvider);
+    final reposState = ref.watch(searchControllerProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -31,9 +31,9 @@ class SearchPage extends ConsumerWidget {
           children: [
             RepoSearchBar(
               onChanged: (query) =>
-                  ref.read(reposControllerProvider.notifier).search(query),
+                  ref.read(searchControllerProvider.notifier).search(query),
               onClear: () =>
-                  ref.read(reposControllerProvider.notifier).search(null),
+                  ref.read(searchControllerProvider.notifier).search(null),
             ),
 
             const SizedBox(height: 12),
