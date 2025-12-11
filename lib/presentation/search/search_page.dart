@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:github_repo_browser_flutter/core/ui/widgets/custom_snack_bar.dart';
 import 'package:github_repo_browser_flutter/presentation/di/presentation_module.dart';
+import 'package:github_repo_browser_flutter/presentation/search/widgets/bottomsheet/show_sort_bottom_sheet.dart';
 import 'package:github_repo_browser_flutter/presentation/search/widgets/repos_grid.dart';
 import 'package:github_repo_browser_flutter/presentation/search/widgets/search_bar.dart';
 import 'package:logger/logger.dart';
@@ -19,7 +21,19 @@ class SearchPage extends ConsumerWidget {
           IconButton(
             icon: Icon(Icons.filter_list),
             onPressed: () {
-              // TODO add filter
+              showSortBottomSheet(
+                  context: context,
+                  selected: ref
+                      .read(searchControllerProvider.notifier)
+                      .sortOrder,
+                  onSelected: (order) {
+                    showSnackbar(context, 'Filtered by: $order');
+                    /*
+                  * TODO sort in database
+                  *  ref.read(searchControllerProvider.notifier).setSortOrder(order);
+                  */
+                  }
+              );
             },
           ),
         ],
@@ -40,7 +54,8 @@ class SearchPage extends ConsumerWidget {
 
             Expanded(
               child: reposState.when(
-                data: (repos) => repos.isEmpty
+                data: (repos) =>
+                repos.isEmpty
                     ? Center(child: Text("No repos found!"))
                     : ReposGrid(repos: repos),
                 loading: () => ReposGrid(isLoading: true),

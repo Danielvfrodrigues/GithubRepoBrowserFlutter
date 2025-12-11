@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:github_repo_browser_flutter/data/remote/dto/repo_dto.dart';
-import 'package:github_repo_browser_flutter/presentation/search/widgets/repo_card.dart';
-import 'package:github_repo_browser_flutter/presentation/search/widgets/repo_card_placeholder.dart';
+import 'package:github_repo_browser_flutter/presentation/search/widgets/card/repo_card.dart';
+import 'package:github_repo_browser_flutter/presentation/search/widgets/card/repo_card_placeholder.dart';
 
 
 class ReposGrid extends StatelessWidget {
