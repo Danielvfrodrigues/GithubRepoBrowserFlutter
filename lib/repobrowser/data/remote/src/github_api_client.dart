@@ -15,13 +15,22 @@ class GithubApiClient {
             ),
           );
 
-  Future<List<RepoDto>> searchRepositories(String query) async {
+  Future<List<RepoDto>> searchRepositories({
+    required String query,
+    int page = 1,
+    int perPage = 20,
+  }) async {
     final response = await dio.get(
       '/search/repositories',
-      queryParameters: {'q': query},
+      queryParameters: {
+        'q': query,
+        'page': page,
+        'per_page': perPage
+      },
     );
 
     final data = response.data['items'] as List<dynamic>;
+
     return data
         .map((e) => RepoDto.fromJson(e as Map<String, dynamic>))
         .toList();
