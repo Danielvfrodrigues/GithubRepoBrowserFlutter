@@ -8,24 +8,71 @@ version: 1.0.0+1
 environment:
   sdk: ^3.10.3
 
+#######################
+##   DEPENDENCIES    ##
+#######################
 dependencies:
   flutter:
     sdk: flutter
 
-  cupertino_icons: ^1.0.8
-  dio: ^5.4.0
-  flutter_riverpod: ^2.5.0 # Managed State (like ViewModel + Flow)
-  freezed_annotation: ^2.4.1 # Para estados imutáveis tipo sealed classes (equivalente ao seu State)
-  json_annotation: ^4.9.0
-  logger: ^2.0.2
+  # Network
+  dio: ^5.9.0
 
+  # Database
+  isar: ^3.1.0
+  isar_flutter_libs: ^3.1.0
+
+  # StateManagement / DI
+  flutter_riverpod: ^2.6.1
+
+  # Models
+  freezed_annotation: ^2.4.1 # DataClass/Lombok alike for Flutter
+
+  # Navigation
+  go_router: ^17.0.1
+
+  # Environment / Config
+  flutter_dotenv: ^6.0.0
+
+  # Cache (offline-first)
+  connectivity_plus: ^7.0.0
+
+  # Serialization
+  json_annotation: ^4.9.0
+
+  # Icons
+  cupertino_icons: ^1.0.8
+  iconsax_flutter: ^1.0.1
+  flutter_launcher_icons: ^0.14.4
+
+  # Utils
+  intl: ^0.20.2 # Translation
+  logger: ^2.6.2 # Logs
+
+############################
+##    DEV DEPENDENCIES    ##
+############################
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  build_runner: ^2.4.8
-  flutter_lints: ^6.0.0
-  freezed: ^2.4.6
+
+  # Code generation
+  build_runner: ^2.4.9
+
+  # Serialization
   json_serializable: ^6.8.0
+
+  # Models
+  freezed: ^2.5.2 # DataClass/Lombok alike for Flutter
+
+  # Database
+  isar_generator: ^3.1.0
+
+  # Lint
+  flutter_lints: ^6.0.0
+
+  # Testing
+  mocktail: ^1.0.3
 
 flutter:
   uses-material-design: true
