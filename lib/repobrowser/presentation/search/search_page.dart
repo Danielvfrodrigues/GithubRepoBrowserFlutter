@@ -2,69 +2,114 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:github_repo_browser_flutter/core/ui/widgets/custom_snack_bar.dart';
 import 'package:github_repo_browser_flutter/repobrowser/presentation/di/presentation_module.dart';
+import 'package:github_repo_browser_flutter/repobrowser/presentation/search/state/search_ui_state.dart';
+import 'package:github_repo_browser_flutter/repobrowser/presentation/search/search_viewmodel.dart';
 import 'package:github_repo_browser_flutter/repobrowser/presentation/search/widgets/bottomsheet/show_sort_bottom_sheet.dart';
+import 'package:github_repo_browser_flutter/repobrowser/presentation/search/widgets/repo_search_app_bar.dart';
 import 'package:github_repo_browser_flutter/repobrowser/presentation/search/widgets/repos_grid.dart';
 import 'package:github_repo_browser_flutter/repobrowser/presentation/search/widgets/search_bar.dart';
 import 'package:logger/logger.dart';
 
-class SearchPage extends ConsumerWidget {
+class SearchPage extends ConsumerStatefulWidget {
   const SearchPage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final reposState = ref.watch(searchControllerProvider);
+  ConsumerState<SearchPage> createState() => _SearchPageState();
+}
+
+class _SearchPageState extends ConsumerState<SearchPage> {
+  late final SearchViewModel _viewModel;
+  late final ScrollController _scrollController;
+
+  @override
+  void initState() {
+    super.initState();
+    _viewModel = ref.read(repoSearchViewModelProvider.notifier);
+    _scrollController = ScrollController()..addListener(_onScroll);
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 300) {
+      _viewModel.loadMore();
+    }
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    ref.listen(repoSearchViewModelProvider, (prev, next) {
+      next.whenOrNull(
+        error: (err, st) {
+          _handleError(err, st);
+        },
+      );
+    });
+
+    final reposState = ref.watch(repoSearchViewModelProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Github Repositories'),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.filter_list),
-            onPressed: () {
-              showSortBottomSheet(
-                  context: context,
-                  selected: ref
-                      .read(searchControllerProvider.notifier)
-                      .sortOrder,
-                  onSelected: (order) {
-                    showSnackbar(context, 'Filtered by: $order');
-                    /*
-                  * TODO sort in database
-                  *  ref.read(searchControllerProvider.notifier).setSortOrder(order);
-                  */
-                  }
-              );
-            },
+      appBar: RepoSearchAppBar(
+        icon: Icon(Icons.filter_list),
+        onPressed: () => _handleSort(),
+      ),
+      body: _buildBody(reposState),
+    );
+  }
+
+  Widget _buildBody(AsyncValue reposState) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 12, right: 12, bottom: 12),
+      child: Column(
+        children: [
+          // SearchBar
+          RepoSearchBar(
+            onChanged: (query) => _viewModel.search(query),
+            onClear: () => _viewModel.search(null),
+          ),
+          const SizedBox(height: 12),
+
+          // Data
+          Expanded(
+            child: reposState.when(
+              loading: () => _handleLoading(),
+              data: (state) => _handleData(state),
+              error: (e, st) => _handleError(e, st),
+            ),
           ),
         ],
       ),
+    );
+  }
 
-      body: Padding(
-        padding: const EdgeInsets.only(left: 12, right: 12, bottom: 12),
-        child: Column(
-          children: [
-            RepoSearchBar(
-              onChanged: (query) =>
-                  ref.read(searchControllerProvider.notifier).search(query),
-              onClear: () =>
-                  ref.read(searchControllerProvider.notifier).search(null),
-            ),
+  void _handleSort() {
+    showSortBottomSheet(
+      context: context,
+      selected: _viewModel.sortOrder,
+      onSelected: (order) {
+        showSnackbar(context, 'Filtered by: $order');
+      },
+    );
+  }
 
-            const SizedBox(height: 12),
+  Widget _handleLoading() {
+    return const ReposGrid(isLoading: true);
+  }
 
-            Expanded(
-              child: reposState.when(
-                data: (repos) =>
-                repos.isEmpty
-                    ? Center(child: Text("No repos found!"))
-                    : ReposGrid(repos: repos),
-                loading: () => ReposGrid(isLoading: true),
-                error: (err, st) => _handleError(err, st),
-              ),
-            ),
-          ],
-        ),
-      ),
+  Widget _handleData(SearchUiState? state) {
+    if (state == null || state.repos.isEmpty) {
+      return const Center(child: Text("No repos found!"));
+    }
+
+    return ReposGrid(
+      repos: state.repos,
+      isLoadingMore: state.isLoadingMore,
+      controller: _scrollController,
     );
   }
 
