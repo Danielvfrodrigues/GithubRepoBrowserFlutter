@@ -23,25 +23,6 @@ class _RepoSearchBarState extends State<RepoSearchBar> {
   Timer? _debounce;
 
   @override
-  void dispose() {
-    searchController.dispose();
-    _debounce?.cancel();
-    super.dispose();
-  }
-
-  void _handleChange(String text) {
-    if (widget.debounceDuration == Duration.zero) {
-      widget.onChanged(text);
-      return;
-    }
-
-    _debounce?.cancel();
-    _debounce = Timer(widget.debounceDuration, () {
-      widget.onChanged(text);
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context).colorScheme;
 
@@ -56,27 +37,43 @@ class _RepoSearchBarState extends State<RepoSearchBar> {
           backgroundColor: WidgetStateProperty.all(theme.surfaceContainerLow),
           elevation: WidgetStateProperty.all(1),
           onChanged: _handleChange,
-          trailing: [
-            AnimatedOpacity(
-              opacity: hasText ? 1 : 0,
-              duration: const Duration(milliseconds: 200),
-              child: _toggleClearButton(hasText),
-            ),
-          ],
+          trailing: [_handleClearButton(hasText)],
         );
       },
     );
   }
 
-  Widget _toggleClearButton(bool hasText) {
-    return hasText
-        ? IconButton(
-            onPressed: () {
-              searchController.clear();
-              widget.onClear();
-            },
-            icon: const Icon(Icons.clear),
-          )
-        : const SizedBox.shrink();
+  void _handleChange(String text) {
+    if (widget.debounceDuration == Duration.zero) {
+      widget.onChanged(text);
+      return;
+    }
+    _debounce?.cancel();
+    _debounce = Timer(widget.debounceDuration, () {
+      widget.onChanged(text);
+    });
+  }
+
+  Widget _handleClearButton(bool hasText) {
+    return AnimatedOpacity(
+      opacity: hasText ? 1 : 0,
+      duration: const Duration(milliseconds: 200),
+      child: hasText
+          ? IconButton(
+              onPressed: () {
+                searchController.clear();
+                widget.onClear();
+              },
+              icon: const Icon(Icons.clear),
+            )
+          : const SizedBox.shrink(),
+    );
+  }
+
+  @override
+  void dispose() {
+    searchController.dispose();
+    _debounce?.cancel();
+    super.dispose();
   }
 }
