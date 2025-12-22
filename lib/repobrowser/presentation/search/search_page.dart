@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:github_repo_browser_flutter/core/ui/widgets/custom_snack_bar.dart';
-import 'package:github_repo_browser_flutter/repobrowser/presentation/di/presentation_module.dart';
+import 'package:github_repo_browser_flutter/repobrowser/presentation/di/presentation_provider.dart';
 import 'package:github_repo_browser_flutter/repobrowser/presentation/search/state/search_ui_state.dart';
 import 'package:github_repo_browser_flutter/repobrowser/presentation/search/search_viewmodel.dart';
 import 'package:github_repo_browser_flutter/repobrowser/presentation/search/widgets/bottomsheet/show_sort_bottom_sheet.dart';

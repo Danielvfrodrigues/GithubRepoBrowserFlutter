@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:github_repo_browser_flutter/repobrowser/data/di/data_module.dart';
+import 'package:github_repo_browser_flutter/repobrowser/data/di/data_provider.dart';
 import 'package:github_repo_browser_flutter/repobrowser/domain/usecase/search_repos_usecase.dart';
 
 final searchReposUseCaseProvider = Provider<SearchReposUsecase>((ref) {
